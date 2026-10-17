@@ -1,0 +1,45 @@
+import 'fake-indexeddb/auto';
+import { afterEach, describe, expect, it } from 'vitest';
+import { FinanzasDB, SETTINGS_ID } from './schema';
+import { CARD_PAYMENT_CATEGORY_ID, seedIfEmpty } from './seed';
+
+let database: FinanzasDB;
+
+afterEach(async () => {
+  await database.delete();
+});
+
+describe('seedIfEmpty', () => {
+  it('carga categorías de gasto, ingreso, la especial de pago de tarjeta y settings', async () => {
+    database = new FinanzasDB(`test-${crypto.randomUUID()}`);
+    await seedIfEmpty(database);
+
+    expect(await database.categories.where('kind').equals('expense').count()).toBe(16);
+    expect(await database.categories.where('kind').equals('income').count()).toBe(4);
+    expect((await database.categories.get(CARD_PAYMENT_CATEGORY_ID))?.name).toBe('Pago de tarjeta');
+    expect(await database.settings.get(SETTINGS_ID)).toEqual({ id: SETTINGS_ID, firstDayOfWeek: 1 });
+  });
+
+  it('es idempotente y no pisa datos del usuario', async () => {
+    database = new FinanzasDB(`test-${crypto.randomUUID()}`);
+    await seedIfEmpty(database);
+    await database.settings.update(SETTINGS_ID, { usdRate: 1200 });
+    await seedIfEmpty(database);
+
+    expect(await database.categories.count()).toBe(20);
+    expect((await database.settings.get(SETTINGS_ID))?.usdRate).toBe(1200);
+  });
+
+  it('índice compuesto [cardId+period] de cuotas', async () => {
+    database = new FinanzasDB(`test-${crypto.randomUUID()}`);
+    await database.installments.bulkAdd([
+      { id: 'a', purchaseId: 'p', cardId: 'visa', number: 1, of: 2, period: '2026-11', amount: 100, currency: 'ARS', categoryId: 'c', status: 'scheduled' },
+      { id: 'b', purchaseId: 'p', cardId: 'visa', number: 2, of: 2, period: '2026-12', amount: 100, currency: 'ARS', categoryId: 'c', status: 'scheduled' },
+      { id: 'c', purchaseId: 'q', cardId: 'master', number: 1, of: 1, period: '2026-11', amount: 50, currency: 'ARS', categoryId: 'c', status: 'scheduled' },
+    ]);
+
+    const visaNov = await database.installments.where('[cardId+period]').equals(['visa', '2026-11']).toArray();
+    expect(visaNov.map((i) => i.id)).toEqual(['a']);
+    expect(await database.installments.where('period').equals('2026-11').count()).toBe(2);
+  });
+});

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import BackupReminder from '../components/BackupReminder';
 import BudgetMeter from '../components/BudgetMeter';
 import CommitmentBars from '../components/CommitmentBars';
 import EmptyState from '../components/EmptyState';
@@ -60,6 +61,7 @@ export default function Inicio() {
   return (
     <div className="space-y-3">
       <PageHeader title="Inicio" />
+      <BackupReminder />
 
       <section className={card}>
         <p className={caption}>Saldo total</p>

@@ -156,7 +156,7 @@ function InstallmentRow({ row, categoryById }: { row: Extract<MovementRow, { kin
   }
 
   return (
-    <RowShell to={`/compras/${i.purchaseId}`} icon="💳" title={title} subtitle={[card?.name, category?.name].filter(Boolean).join(' · ')}
+    <RowShell to={`/compras/${i.purchaseId}`} icon="💳" title={title} subtitle={[purchase?.recurringId ? '🔁' : undefined, card?.name, category?.name].filter(Boolean).join(' · ')}
       amount={formatMoney(amount, i.currency)} amountClass={amount > 0 ? 'text-emerald-400' : ''} onDelete={handleDelete} deleteLabel={`Borrar compra ${description}`} />
   );
 }
@@ -174,7 +174,7 @@ function TransactionRow({ tx, accountById, categoryById, filterAccountId }: {
   const currency = (incoming ? to : from)?.currency ?? 'ARS';
 
   const title = tx.description || category?.name || (tx.type === 'transfer' ? 'Transferencia' : 'Sin descripción');
-  const subtitle = tx.type === 'transfer' ? `${from?.name ?? '?'} → ${to?.name ?? '?'}` : [category?.name, from?.name].filter(Boolean).join(' · ');
+  const subtitle = tx.type === 'transfer' ? `${from?.name ?? '?'} → ${to?.name ?? '?'}` : [tx.recurringId ? '🔁' : undefined, category?.name, from?.name].filter(Boolean).join(' · ');
   const color = tx.type === 'transfer' ? 'text-sky-300' : amount < 0 ? 'text-slate-100' : 'text-emerald-400';
 
   async function handleDelete() {

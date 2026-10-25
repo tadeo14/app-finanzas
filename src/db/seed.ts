@@ -1,4 +1,5 @@
 // Datos iniciales: categorías típicas (SPEC §5.6) y settings por defecto.
+import { today } from '../domain/dates';
 import type { Category } from '../domain/types';
 import { SETTINGS_ID, type FinanzasDB } from './schema';
 
@@ -52,8 +53,12 @@ export async function seedIfEmpty(database: FinanzasDB): Promise<void> {
       });
       await database.categories.bulkAdd(categories);
     }
-    if (!(await database.settings.get(SETTINGS_ID))) {
-      await database.settings.add({ id: SETTINGS_ID, firstDayOfWeek: 1 });
+    const settings = await database.settings.get(SETTINGS_ID);
+    if (!settings) {
+      await database.settings.add({ id: SETTINGS_ID, firstDayOfWeek: 1, installedAt: today() });
+    } else if (!settings.installedAt) {
+      // bases creadas antes de existir el recordatorio de backup: se cuenta desde ahora
+      await database.settings.put({ ...settings, installedAt: today() });
     }
   });
 }

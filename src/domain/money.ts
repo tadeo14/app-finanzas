@@ -62,6 +62,13 @@ export function parseMoney(input: string): number | null {
   return negative ? -cents : cents;
 }
 
+/** Centavos como número decimal con coma y sin separador de miles (para planillas): 123456 → "1234,56". */
+export function formatDecimal(cents: number): string {
+  assertCents(cents);
+  const abs = Math.abs(cents);
+  return `${cents < 0 ? '-' : ''}${Math.floor(abs / 100)},${String(abs % 100).padStart(2, '0')}`;
+}
+
 /**
  * Monto abreviado para ejes y etiquetas chicas, sin símbolo: 950 → "950", 1.500 → "1,5 mil",
  * 350.000 → "350 mil", 1.200.000 → "1,2 M". Recibe centavos.

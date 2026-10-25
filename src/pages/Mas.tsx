@@ -1,19 +1,21 @@
 import { Link } from 'react-router-dom';
+import BackupReminder from '../components/BackupReminder';
 import PageHeader from '../components/PageHeader';
 
 const ITEMS = [
   { to: '/mas/cuentas', label: 'Cuentas', detail: 'Bancos, efectivo y billeteras', icon: '🏦' },
   { to: '/mas/categorias', label: 'Categorías', detail: 'Con subcategorías', icon: '🏷️' },
   { to: '/mas/presupuestos', label: 'Presupuestos', detail: 'Límite mensual por categoría', icon: '🎯' },
+  { to: '/mas/recurrentes', label: 'Recurrentes', detail: 'Gastos fijos y suscripciones', icon: '🔁' },
   { to: '/mas/cotizacion', label: 'Cotización del dólar', detail: 'Para los totales en pesos', icon: '💵' },
+  { to: '/mas/backup', label: 'Backup', detail: 'Exportar e importar tus datos', icon: '💾' },
 ];
-
-const UPCOMING = ['Recurrentes', 'Backup'];
 
 export default function Mas() {
   return (
     <>
       <PageHeader title="Más" />
+      <BackupReminder />
       <ul className="divide-y divide-slate-800 overflow-hidden rounded-xl bg-slate-900">
         {ITEMS.map((item) => (
           <li key={item.to}>
@@ -28,7 +30,6 @@ export default function Mas() {
           </li>
         ))}
       </ul>
-      <p className="mt-4 text-xs text-slate-500">Próximamente: {UPCOMING.join(', ')}.</p>
     </>
   );
 }

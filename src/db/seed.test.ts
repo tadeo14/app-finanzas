@@ -1,5 +1,6 @@
 import 'fake-indexeddb/auto';
 import { afterEach, describe, expect, it } from 'vitest';
+import { today } from '../domain/dates';
 import { FinanzasDB, SETTINGS_ID } from './schema';
 import { CARD_PAYMENT_CATEGORY_ID, seedIfEmpty } from './seed';
 
@@ -17,7 +18,7 @@ describe('seedIfEmpty', () => {
     expect(await database.categories.where('kind').equals('expense').count()).toBe(16);
     expect(await database.categories.where('kind').equals('income').count()).toBe(4);
     expect((await database.categories.get(CARD_PAYMENT_CATEGORY_ID))?.name).toBe('Pago de tarjeta');
-    expect(await database.settings.get(SETTINGS_ID)).toEqual({ id: SETTINGS_ID, firstDayOfWeek: 1 });
+    expect(await database.settings.get(SETTINGS_ID)).toEqual({ id: SETTINGS_ID, firstDayOfWeek: 1, installedAt: today() });
   });
 
   it('es idempotente y no pisa datos del usuario', async () => {
@@ -60,5 +61,14 @@ describe('migración del esquema', () => {
     expect((await database.statementPayments.get('p'))?.amountARS).toBe(100);
     await database.statementPayments.add({ id: 'q', statementId: 's', accountId: 'a', date: '2026-11-18', amountARS: 1, amountUSD: 0, groupId: 'g' });
     expect((await database.statementPayments.where('groupId').equals('g').toArray()).map((p) => p.id)).toEqual(['q']);
+  });
+});
+
+describe('installedAt', () => {
+  it('una base vieja sin installedAt lo recibe sin perder el resto de los ajustes', async () => {
+    database = new FinanzasDB(`test-${crypto.randomUUID()}`);
+    await database.settings.add({ id: SETTINGS_ID, firstDayOfWeek: 0, usdRate: 900 });
+    await seedIfEmpty(database);
+    expect(await database.settings.get(SETTINGS_ID)).toEqual({ id: SETTINGS_ID, firstDayOfWeek: 0, usdRate: 900, installedAt: today() });
   });
 });

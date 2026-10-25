@@ -117,4 +117,8 @@ export interface Recurring {
 export interface Settings {
   usdRate?: number;
   firstDayOfWeek: 0 | 1;
+  /** YYYY-MM-DD del último export de backup. */
+  lastBackupAt?: string;
+  /** YYYY-MM-DD de la primera vez que se usó la app: base del recordatorio de backup si nunca se exportó. */
+  installedAt?: string;
 }

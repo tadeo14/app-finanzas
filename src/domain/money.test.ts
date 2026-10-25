@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { convert, formatCompact, formatMoney, formatMoneyShort, parseMoney, splitEvenly, sumCents } from './money';
+import { convert, formatCompact, formatDecimal, formatMoney, formatMoneyShort, parseMoney, splitEvenly, sumCents } from './money';
 
 describe('formatMoney', () => {
   it('formatea en es-AR con miles y decimales', () => {
@@ -98,5 +98,17 @@ describe('formatCompact', () => {
     [-35_000_000, '-350 mil'],
   ])('%i → %s', (cents, expected) => {
     expect(formatCompact(cents)).toBe(expected);
+  });
+});
+
+describe('formatDecimal', () => {
+  it.each([
+    [123456, '1234,56'],
+    [5, '0,05'],
+    [100, '1,00'],
+    [-250, '-2,50'],
+    [0, '0,00'],
+  ])('%i → %s', (cents, expected) => {
+    expect(formatDecimal(cents)).toBe(expected);
   });
 });

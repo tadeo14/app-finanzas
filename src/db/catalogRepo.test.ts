@@ -109,10 +109,10 @@ describe('categorías', () => {
 describe('cotización', () => {
   it('guarda, valida y quita la cotización sin tocar el resto de los ajustes', async () => {
     await saveUsdRate(database, 1250.5);
-    expect(await database.settings.get(SETTINGS_ID)).toEqual({ id: SETTINGS_ID, firstDayOfWeek: 1, usdRate: 1250.5 });
+    expect(await database.settings.get(SETTINGS_ID)).toMatchObject({ id: SETTINGS_ID, firstDayOfWeek: 1, usdRate: 1250.5 });
     await expect(saveUsdRate(database, 0)).rejects.toThrow('mayor a cero');
     await expect(saveUsdRate(database, Number.NaN)).rejects.toThrow('mayor a cero');
     await saveUsdRate(database, undefined);
-    expect(await database.settings.get(SETTINGS_ID)).toEqual({ id: SETTINGS_ID, firstDayOfWeek: 1 });
+    expect((await database.settings.get(SETTINGS_ID))?.usdRate).toBeUndefined();
   });
 });

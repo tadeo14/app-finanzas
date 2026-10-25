@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { AXIS, GRID, OTHER, SERIES, SURFACE } from '../components/chartColors';
+import { chartColors } from '../components/chartColors';
 import EmptyState from '../components/EmptyState';
 import MonthSelector from '../components/MonthSelector';
 import PageHeader from '../components/PageHeader';
@@ -10,6 +10,7 @@ import { formatCompact, formatMoney } from '../domain/money';
 import { entriesForMonth, expensesByCategory, monthlySeries, NO_CATEGORY, sliceRows } from '../domain/reports';
 import { useCategories } from '../hooks/useData';
 import { useReportSources } from '../hooks/useReport';
+import { useResolvedTheme } from '../theme';
 
 const SHORT_MONTH = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 const monthLabel = (period: string) => SHORT_MONTH[Number(period.slice(5)) - 1] ?? period;
@@ -50,6 +51,7 @@ function ExpensesByCategory({ month, usdRate }: { month: string; usdRate?: numbe
   const { src } = useReportSources();
   const categories = useCategories();
   const [drill, setDrill] = useState<string>();
+  const colors = chartColors(useResolvedTheme());
 
   const model = useMemo(() => {
     if (!src) return null;
@@ -79,8 +81,8 @@ function ExpensesByCategory({ month, usdRate }: { month: string; usdRate?: numbe
   const total = root ? root.amount : model.total;
   const { items, othersAmount, othersCount } = sliceRows(all);
   const slices: (Slice & { color: string })[] = [
-    ...items.map((s, i) => ({ ...s, color: SERIES[i] ?? OTHER })),
-    ...(othersCount > 0 ? [{ key: 'others', name: `Otros (${othersCount})`, amount: othersAmount, color: OTHER }] : []),
+    ...items.map((s, i) => ({ ...s, color: colors.series[i] ?? colors.other })),
+    ...(othersCount > 0 ? [{ key: 'others', name: `Otros (${othersCount})`, amount: othersAmount, color: colors.other }] : []),
   ];
 
   return (
@@ -113,7 +115,7 @@ function ExpensesByCategory({ month, usdRate }: { month: string; usdRate?: numbe
                   nameKey="name"
                   innerRadius={62}
                   outerRadius={92}
-                  stroke={SURFACE}
+                  stroke={colors.surface}
                   strokeWidth={2}
                   startAngle={90}
                   endAngle={-270}
@@ -173,6 +175,7 @@ function Evolution({ endMonth, usdRate }: { endMonth: string; usdRate?: number }
   const { src } = useReportSources();
   const [includeFuture, setIncludeFuture] = useState(false);
   const [asTable, setAsTable] = useState(false);
+  const colors = chartColors(useResolvedTheme());
 
   const model = useMemo(() => (src ? monthlySeries(src, endMonth, usdRate, 12, includeFuture ? 6 : 0) : null), [src, endMonth, usdRate, includeFuture]);
   if (!model) return null;
@@ -185,8 +188,8 @@ function Evolution({ endMonth, usdRate }: { endMonth: string; usdRate?: number }
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         <ul className="flex gap-4 text-sm">
-          <li className="flex items-center gap-2"><span aria-hidden className="h-3 w-3 rounded-sm" style={{ background: SERIES[0] }} />Ingresos</li>
-          <li className="flex items-center gap-2"><span aria-hidden className="h-3 w-3 rounded-sm" style={{ background: SERIES[1] }} />Gastos</li>
+          <li className="flex items-center gap-2"><span aria-hidden className="h-3 w-3 rounded-sm" style={{ background: colors.series[0] }} />Ingresos</li>
+          <li className="flex items-center gap-2"><span aria-hidden className="h-3 w-3 rounded-sm" style={{ background: colors.series[1] }} />Gastos</li>
         </ul>
         <button type="button" onClick={() => setAsTable(!asTable)} className="text-sm text-emerald-400">{asTable ? 'Ver gráfico' : 'Ver como tabla'}</button>
       </div>
@@ -233,16 +236,16 @@ function Evolution({ endMonth, usdRate }: { endMonth: string; usdRate?: number }
           <div className="mt-3 h-64" role="img" aria-label="Ingresos y gastos de los últimos 12 meses. Los mismos valores están disponibles como tabla.">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data} barGap={2} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
-                <CartesianGrid vertical={false} stroke={GRID} />
+                <CartesianGrid vertical={false} stroke={colors.grid} />
                 {/* Con 18 meses no entran todas las etiquetas: se muestra una de cada dos (el tooltip tiene el mes completo). */}
-                <XAxis dataKey="month" tickFormatter={monthLabel} tick={{ fill: AXIS, fontSize: 11 }} tickLine={false} axisLine={{ stroke: GRID }} interval={data.length > 12 ? 1 : 0} />
-                <YAxis tickFormatter={(v: number) => formatCompact(v).replace(' ', '\u00a0')} tick={{ fill: AXIS, fontSize: 11 }} tickLine={false} axisLine={false} width={56} />
-                <Tooltip cursor={{ fill: 'rgba(255,255,255,0.06)' }} content={<EvolutionTooltip />} />
-                <Bar dataKey="income" name="Ingresos" fill={SERIES[0]} radius={[4, 4, 0, 0]} maxBarSize={14} isAnimationActive={false}>
-                  {data.map((p) => <Cell key={p.month} fill={SERIES[0]} fillOpacity={p.projected ? 0.3 : 1} stroke={SERIES[0]} strokeWidth={p.projected ? 1.5 : 0} />)}
+                <XAxis dataKey="month" tickFormatter={monthLabel} tick={{ fill: colors.axis, fontSize: 11 }} tickLine={false} axisLine={{ stroke: colors.grid }} interval={data.length > 12 ? 1 : 0} />
+                <YAxis tickFormatter={(v: number) => formatCompact(v).replace(' ', '\u00a0')} tick={{ fill: colors.axis, fontSize: 11 }} tickLine={false} axisLine={false} width={56} />
+                <Tooltip cursor={{ fill: colors.grid }} content={<EvolutionTooltip />} />
+                <Bar dataKey="income" name="Ingresos" fill={colors.series[0]} radius={[4, 4, 0, 0]} maxBarSize={14} isAnimationActive={false}>
+                  {data.map((p) => <Cell key={p.month} fill={colors.series[0]} fillOpacity={p.projected ? 0.3 : 1} stroke={colors.series[0]} strokeWidth={p.projected ? 1.5 : 0} />)}
                 </Bar>
-                <Bar dataKey="expense" name="Gastos" fill={SERIES[1]} radius={[4, 4, 0, 0]} maxBarSize={14} isAnimationActive={false}>
-                  {data.map((p) => <Cell key={p.month} fill={SERIES[1]} fillOpacity={p.projected ? 0.3 : 1} stroke={SERIES[1]} strokeWidth={p.projected ? 1.5 : 0} />)}
+                <Bar dataKey="expense" name="Gastos" fill={colors.series[1]} radius={[4, 4, 0, 0]} maxBarSize={14} isAnimationActive={false}>
+                  {data.map((p) => <Cell key={p.month} fill={colors.series[1]} fillOpacity={p.projected ? 0.3 : 1} stroke={colors.series[1]} strokeWidth={p.projected ? 1.5 : 0} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -261,7 +264,7 @@ interface TooltipProps {
   payload?: readonly { name?: string | number; value?: number | string; payload?: { month?: string; projected?: boolean } }[];
 }
 
-const tooltipBox = 'rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-xs shadow-lg';
+const tooltipBox = 'rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-100 shadow-lg';
 
 function MoneyTooltip({ active, payload, total }: TooltipProps & { total: number }) {
   const item = payload?.[0];

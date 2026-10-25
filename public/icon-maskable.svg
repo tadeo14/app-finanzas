@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo a sangre y dibujo dentro de la zona segura (círculo central del 80%): el sistema recorta con su propia forma. -->
+  <rect width="512" height="512" fill="#0f172a"/>
+  <g transform="translate(256 256) scale(0.8) translate(-256 -256)">
+    <rect x="88" y="150" width="336" height="212" rx="32" fill="#10b981"/>
+    <rect x="88" y="196" width="336" height="44" fill="#065f46"/>
+    <rect x="128" y="292" width="104" height="26" rx="9" fill="#ecfdf5"/>
+    <rect x="256" y="292" width="60" height="26" rx="9" fill="#ecfdf5" opacity=".55"/>
+  </g>
+</svg>

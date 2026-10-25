@@ -1,10 +1,12 @@
 import type { MonthCommitment } from '../domain/cards';
 import { formatPeriod } from '../domain/dates';
 import { formatMoney } from '../domain/money';
-import { SERIES } from './chartColors';
+import { useResolvedTheme } from '../theme';
+import { chartColors } from './chartColors';
 
 /** Cuotas programadas mes a mes: una sola serie, una sola barra fina por mes con su valor al lado. */
 export default function CommitmentBars({ months }: { months: MonthCommitment[] }) {
+  const colors = chartColors(useResolvedTheme());
   const max = Math.max(1, ...months.map((m) => Math.abs(m.totalARS)));
   return (
     <ul className="space-y-2">
@@ -18,7 +20,7 @@ export default function CommitmentBars({ months }: { months: MonthCommitment[] }
             </span>
           </div>
           <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-800">
-            <div className="h-full rounded-full" style={{ width: `${(Math.abs(m.totalARS) / max) * 100}%`, background: SERIES[0] }} />
+            <div className="h-full rounded-full" style={{ width: `${(Math.abs(m.totalARS) / max) * 100}%`, background: colors.series[0] }} />
           </div>
         </li>
       ))}

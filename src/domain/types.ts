@@ -121,4 +121,6 @@ export interface Settings {
   lastBackupAt?: string;
   /** YYYY-MM-DD de la primera vez que se usó la app: base del recordatorio de backup si nunca se exportó. */
   installedAt?: string;
+  /** Apariencia: 'system' (por defecto, sigue al dispositivo), 'light' o 'dark'. */
+  theme?: 'system' | 'light' | 'dark';
 }

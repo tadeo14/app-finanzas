@@ -121,7 +121,7 @@ function CategoryForm({ draft, categories, onDone }: { draft: CategoryDraft; cat
         <div className="flex flex-wrap gap-2">
           {COLORS.map((c) => (
             <button key={c} type="button" aria-label={`Color ${c}`} aria-pressed={form.color === c} onClick={() => setForm({ ...form, color: c })}
-              className={`h-9 w-9 rounded-full ${form.color === c ? 'ring-2 ring-white ring-offset-2 ring-offset-slate-950' : ''}`} style={{ background: c }} />
+              className={`h-9 w-9 rounded-full ${form.color === c ? 'ring-2 ring-slate-100 ring-offset-2 ring-offset-slate-950' : ''}`} style={{ background: c }} />
           ))}
         </div>
       </Field>

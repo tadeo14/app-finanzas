@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { deleteBudget, deleteCategory, saveBudget, saveCategory, saveUsdRate } from './catalogRepo';
+import { deleteBudget, deleteCategory, saveBudget, saveCategory, saveTheme, saveUsdRate } from './catalogRepo';
 import { saveCard, savePurchase } from './cardsRepo';
 import { saveAccount, saveTransaction } from './repo';
 import { FinanzasDB, SETTINGS_ID } from './schema';
@@ -114,5 +114,16 @@ describe('cotización', () => {
     await expect(saveUsdRate(database, Number.NaN)).rejects.toThrow('mayor a cero');
     await saveUsdRate(database, undefined);
     expect((await database.settings.get(SETTINGS_ID))?.usdRate).toBeUndefined();
+  });
+});
+
+describe('apariencia', () => {
+  it('guarda la preferencia sin tocar el resto de los ajustes y rechaza valores desconocidos', async () => {
+    await saveUsdRate(database, 1000);
+    await saveTheme(database, 'light');
+    expect(await database.settings.get(SETTINGS_ID)).toMatchObject({ theme: 'light', usdRate: 1000 });
+    await saveTheme(database, 'system');
+    expect((await database.settings.get(SETTINGS_ID))?.theme).toBe('system');
+    await expect(saveTheme(database, 'sepia' as never)).rejects.toThrow('no es válida');
   });
 });

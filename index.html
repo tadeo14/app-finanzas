@@ -3,8 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Finanzas" />
+    <meta name="description" content="Gastos, cuentas y tarjetas en cuotas. Tus datos quedan en tu dispositivo." />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#0f172a" />
+    <!-- Tema inicial según el dispositivo, antes de cargar la app, para que no parpadee (la preferencia guardada se aplica al arrancar). -->
+    <script>
+      try {
+        if (!window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.classList.remove('dark');
+      } catch (e) {}
+    </script>
     <title>Finanzas</title>
   </head>
   <body class="bg-slate-950 text-slate-100">

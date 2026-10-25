@@ -24,7 +24,7 @@ export default function CategoryGrid({
           onClick={() => onChange(c.id)}
           aria-pressed={value === c.id}
           className={`flex flex-col items-center gap-1 rounded-xl border px-1 py-2 text-[11px] leading-tight ${
-            value === c.id ? 'border-emerald-500 bg-emerald-950/60 text-white' : 'border-slate-800 bg-slate-900 text-slate-300'
+            value === c.id ? 'border-emerald-500 bg-emerald-950/60 text-slate-100' : 'border-slate-800 bg-slate-900 text-slate-300'
           }`}
         >
           <span aria-hidden className="text-xl">

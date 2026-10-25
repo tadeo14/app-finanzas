@@ -107,3 +107,12 @@ export async function saveUsdRate(database: FinanzasDB, rate: number | undefined
     await database.settings.put(next);
   });
 }
+
+/** Preferencia de apariencia. */
+export async function saveTheme(database: FinanzasDB, theme: 'system' | 'light' | 'dark'): Promise<void> {
+  if (!['system', 'light', 'dark'].includes(theme)) throw new ValidationError(['La apariencia no es válida.']);
+  await database.transaction('rw', database.settings, async () => {
+    const current = (await database.settings.get(SETTINGS_ID)) ?? { id: SETTINGS_ID, firstDayOfWeek: 1 as const };
+    await database.settings.put({ ...current, theme });
+  });
+}

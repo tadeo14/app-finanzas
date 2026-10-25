@@ -31,7 +31,17 @@ export function PrimaryButton(props: React.ButtonHTMLAttributes<HTMLButtonElemen
   return (
     <button
       {...props}
-      className={`w-full rounded-xl bg-emerald-600 py-3.5 text-base font-semibold text-white active:bg-emerald-700 disabled:opacity-50 ${props.className ?? ''}`}
+      className={`w-full rounded-xl bg-brand py-3.5 text-base font-semibold text-white active:bg-brand-hover disabled:opacity-50 ${props.className ?? ''}`}
+    />
+  );
+}
+
+/** Acción destructiva (reemplazar todo, borrar): rojo fijo con texto blanco en ambos temas. */
+export function DangerButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      {...props}
+      className={`w-full rounded-xl bg-red-700 py-3 text-sm font-semibold text-white active:bg-red-800 disabled:opacity-50 ${props.className ?? ''}`}
     />
   );
 }
@@ -74,7 +84,7 @@ export function Segmented<T extends string>({
           disabled={o.disabled}
           onClick={() => onChange(o.value)}
           className={`rounded-lg py-2 text-sm font-medium disabled:opacity-40 ${
-            value === o.value ? 'bg-slate-700 text-white' : 'text-slate-400'
+            value === o.value ? 'bg-slate-700 text-slate-100' : 'text-slate-400'
           }`}
         >
           {o.label}

@@ -71,7 +71,7 @@ const RULES: Record<BackupTable, Record<string, Check>> = {
   settings: {
     firstDayOfWeek: (v) => v === 0 || v === 1,
     usdRate: optional((v) => typeof v === 'number' && Number.isFinite(v) && v > 0),
-    lastBackupAt: optional(isDate), installedAt: optional(isDate),
+    lastBackupAt: optional(isDate), installedAt: optional(isDate), theme: optional(oneOf('system', 'light', 'dark')),
   },
 };
 

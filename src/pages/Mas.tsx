@@ -7,6 +7,7 @@ const ITEMS = [
   { to: '/mas/categorias', label: 'Categorías', detail: 'Con subcategorías', icon: '🏷️' },
   { to: '/mas/presupuestos', label: 'Presupuestos', detail: 'Límite mensual por categoría', icon: '🎯' },
   { to: '/mas/recurrentes', label: 'Recurrentes', detail: 'Gastos fijos y suscripciones', icon: '🔁' },
+  { to: '/mas/apariencia', label: 'Apariencia', detail: 'Claro, oscuro o automático', icon: '🌓' },
   { to: '/mas/cotizacion', label: 'Cotización del dólar', detail: 'Para los totales en pesos', icon: '💵' },
   { to: '/mas/backup', label: 'Backup', detail: 'Exportar e importar tus datos', icon: '💾' },
 ];

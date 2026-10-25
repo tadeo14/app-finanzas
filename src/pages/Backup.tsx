@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import BackupReminder from '../components/BackupReminder';
-import { ErrorList, PrimaryButton, SecondaryButton } from '../components/ui';
+import { DangerButton, ErrorList, PrimaryButton, SecondaryButton } from '../components/ui';
 import { backupReminder, countRows, type BackupFile, type BackupTable } from '../domain/backup';
 import { formatDate, today } from '../domain/dates';
 import { backupFileName, exportBackup, exportMovementsCSV, importBackup, parseBackup } from '../db/backup';
@@ -124,7 +124,7 @@ export default function Backup() {
           </p>
           <div className="grid grid-cols-2 gap-2">
             <SecondaryButton type="button" onClick={() => setPending(null)}>Cancelar</SecondaryButton>
-            <PrimaryButton type="button" onClick={() => void handleReplace()} className="bg-red-700 py-3 text-sm active:bg-red-800">Reemplazar todo</PrimaryButton>
+            <DangerButton type="button" onClick={() => void handleReplace()}>Reemplazar todo</DangerButton>
           </div>
         </section>
       )}

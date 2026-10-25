@@ -63,6 +63,12 @@ export default function Inicio() {
       <PageHeader title="Inicio" />
       <BackupReminder />
 
+      {transactions !== undefined && transactions.length === 0 && installments.length === 0 && (
+        <p className="rounded-xl border border-dashed border-slate-700 p-4 text-center text-sm text-slate-400">
+          Todavía no cargaste movimientos. Tocá <span className="font-semibold text-emerald-400">+</span> para registrar un gasto, un ingreso o una compra con tarjeta.
+        </p>
+      )}
+
       <section className={card}>
         <p className={caption}>Saldo total</p>
         <p className="mt-1 text-3xl font-semibold tabular-nums">{formatMoney(totals.ARS, 'ARS')}</p>

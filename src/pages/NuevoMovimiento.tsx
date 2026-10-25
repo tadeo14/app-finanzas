@@ -117,7 +117,7 @@ export default function NuevoMovimiento() {
     return (
       <div className="space-y-4 py-10 text-center text-slate-400">
         <p>Para cargar movimientos primero creá una cuenta (banco, efectivo o billetera).</p>
-        <Link to="/mas/cuentas" className="inline-block rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white">
+        <Link to="/mas/cuentas" className="inline-block rounded-xl bg-brand px-4 py-3 font-semibold text-white">
           Crear cuenta
         </Link>
       </div>

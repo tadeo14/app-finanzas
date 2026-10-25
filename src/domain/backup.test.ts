@@ -74,6 +74,7 @@ describe('validateBackup', () => {
     expect(errorsOf((b) => { (b.data.cards![0] as Record<string, unknown>).defaultClosingDay = 32; })[0]).toContain('"defaultClosingDay"');
     expect(errorsOf((b) => { (b.data.installments![0] as Record<string, unknown>).period = '2026-13'; })[0]).toContain('"period"');
     expect(errorsOf((b) => { (b.data.settings![0] as Record<string, unknown>).usdRate = -1; })[0]).toContain('"usdRate"');
+    expect(errorsOf((b) => { (b.data.settings![0] as Record<string, unknown>).theme = 'sepia'; })[0]).toContain('"theme"');
   });
 
   it('detecta filas sin id o con id repetido', () => {

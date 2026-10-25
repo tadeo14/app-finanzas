@@ -1,8 +1,11 @@
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link, Navigate, Route, Routes } from 'react-router-dom';
 import BottomNav from './components/BottomNav';
 import Fab from './components/Fab';
+import { useSettings } from './hooks/useData';
 import { startup } from './startup';
+import { applyTheme } from './theme';
+import Apariencia from './pages/Apariencia';
 import Backup from './pages/Backup';
 import Categorias from './pages/Categorias';
 import Cotizacion from './pages/Cotizacion';
@@ -50,9 +53,21 @@ function StartupNotice() {
   );
 }
 
+/** Mantiene el tema del documento al día con la preferencia guardada (también después de importar un backup). */
+function ThemeSync() {
+  const settings = useSettings();
+  const loaded = settings !== undefined;
+  const theme = settings?.theme;
+  useEffect(() => {
+    if (loaded) applyTheme(theme);
+  }, [loaded, theme]);
+  return null;
+}
+
 export default function App() {
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col">
+      <ThemeSync />
       <main className="flex-1 px-4 pb-24 pt-[max(1rem,env(safe-area-inset-top))]">
         <StartupNotice />
         <Suspense fallback={null}>
@@ -73,6 +88,7 @@ export default function App() {
             <Route path="/mas/cotizacion" element={<Cotizacion />} />
             <Route path="/mas/recurrentes" element={<Recurrentes />} />
             <Route path="/mas/backup" element={<Backup />} />
+            <Route path="/mas/apariencia" element={<Apariencia />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>

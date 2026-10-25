@@ -124,7 +124,7 @@ export default function NuevaCompra() {
     return (
       <div className="space-y-4 py-10 text-center text-slate-400">
         <p>Para cargar compras con tarjeta primero agregá una tarjeta.</p>
-        <Link to="/tarjetas" className="inline-block rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white">Ir a Tarjetas</Link>
+        <Link to="/tarjetas" className="inline-block rounded-xl bg-brand px-4 py-3 font-semibold text-white">Ir a Tarjetas</Link>
       </div>
     );
   }
@@ -196,7 +196,7 @@ export default function NuevaCompra() {
         <div className="flex flex-wrap gap-2">
           {PRESETS.map((n) => (
             <button key={n} type="button" aria-pressed={installments === n} onClick={() => setInstallments(n)}
-              className={`min-w-12 rounded-xl border px-3 py-2.5 text-sm font-medium ${installments === n ? 'border-emerald-500 bg-emerald-950/60 text-white' : 'border-slate-800 bg-slate-900 text-slate-300'}`}>
+              className={`min-w-12 rounded-xl border px-3 py-2.5 text-sm font-medium ${installments === n ? 'border-emerald-500 bg-emerald-950/60 text-slate-100' : 'border-slate-800 bg-slate-900 text-slate-300'}`}>
               {n}
             </button>
           ))}

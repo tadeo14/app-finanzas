@@ -1,16 +1,19 @@
 import type { BudgetLevel, BudgetProgress } from '../domain/reports';
 import { formatMoney } from '../domain/money';
-import { SERIES, STATUS } from './chartColors';
+import { useResolvedTheme } from '../theme';
+import { chartColors } from './chartColors';
 
-const LEVEL: Record<BudgetLevel, { color: string; icon: string; label: string }> = {
-  ok: { color: SERIES[0], icon: '', label: '' },
-  warning: { color: STATUS.warning, icon: '⚠', label: 'Más del 80%' },
-  over: { color: STATUS.critical, icon: '⛔', label: 'Superado' },
+const LEVEL: Record<BudgetLevel, { icon: string; label: string }> = {
+  ok: { icon: '', label: '' },
+  warning: { icon: '⚠', label: 'Más del 80%' },
+  over: { icon: '⛔', label: 'Superado' },
 };
 
 /** Medidor de un presupuesto. El estado va con ícono y texto, no solo con color. */
 export default function BudgetMeter({ progress, name, icon }: { progress: BudgetProgress; name: string; icon?: string }) {
-  const { color, icon: statusIcon, label } = LEVEL[progress.level];
+  const palette = chartColors(useResolvedTheme());
+  const color = { ok: palette.series[0]!, warning: palette.warning, over: palette.critical }[progress.level];
+  const { icon: statusIcon, label } = LEVEL[progress.level];
   const percent = Math.round(progress.ratio * 100);
   return (
     <div>

@@ -1,9 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
 
-/** Botón flotante "+" para la carga rápida. Se oculta dentro del propio formulario. */
+/** Botón flotante "+" para la carga rápida. Se oculta dentro de los formularios de carga y edición. */
 export default function Fab() {
   const { pathname } = useLocation();
-  if (pathname === '/nuevo' || pathname.startsWith('/movimientos/')) return null;
+  if (['/nuevo', '/movimientos/', '/compras/'].some((p) => pathname.startsWith(p))) return null;
   return (
     <Link
       to="/nuevo"

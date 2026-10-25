@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import CategoryGrid from '../components/CategoryGrid';
 import MoneyInput from '../components/MoneyInput';
 import { ErrorList, Field, inputClass, PrimaryButton, Segmented, SecondaryButton } from '../components/ui';
@@ -17,7 +17,7 @@ const MODES: { value: Mode; label: string; disabled?: boolean }[] = [
   { value: 'expense', label: 'Gasto' },
   { value: 'income', label: 'Ingreso' },
   { value: 'transfer', label: 'Transferencia' },
-  { value: 'card', label: 'Tarjeta', disabled: true }, // llega en la fase 3
+  { value: 'card', label: 'Tarjeta' },
 ];
 
 /** Carga rápida (/nuevo) y edición (/movimientos/:id) de gastos, ingresos y transferencias. */
@@ -28,7 +28,8 @@ export default function NuevoMovimiento() {
   const allAccounts = useAccounts();
   const categories = useCategories();
 
-  const [mode, setMode] = useState<Mode>('expense');
+  const location = useLocation();
+  const [mode, setMode] = useState<Mode>(() => (location.state as { mode?: Transaction['type'] } | null)?.mode ?? 'expense');
   const [amount, setAmount] = useState<number | null>(null);
   const [toAmount, setToAmount] = useState<number | null>(null);
   const [description, setDescription] = useState('');
@@ -148,6 +149,10 @@ export default function NuevoMovimiento() {
           options={id ? MODES.filter((m) => m.value !== 'card') : MODES}
           value={mode}
           onChange={(m) => {
+            if (m === 'card') {
+              navigate('/nuevo/tarjeta', { replace: true });
+              return;
+            }
             setMode(m);
             setCategoryId(undefined);
           }}

@@ -1,16 +1,31 @@
-import { useLiveQuery } from 'dexie-react-hooks';
+import { Link } from 'react-router-dom';
 import PageHeader from '../components/PageHeader';
-import { db } from '../db/schema';
+
+const ITEMS = [
+  { to: '/mas/cuentas', label: 'Cuentas', detail: 'Bancos, efectivo y billeteras', icon: '🏦' },
+];
+
+const UPCOMING = ['Categorías', 'Presupuestos', 'Recurrentes', 'Cotización USD', 'Backup'];
 
 export default function Mas() {
-  const categoryCount = useLiveQuery(() => db.categories.count());
   return (
     <>
       <PageHeader title="Más" />
-      <section className="rounded-xl bg-slate-900 p-4 text-sm text-slate-300">
-        <p>Categorías cargadas: {categoryCount ?? '…'}</p>
-        <p className="mt-2 text-slate-500">Cuentas, categorías, presupuestos y backup llegan en las próximas fases.</p>
-      </section>
+      <ul className="divide-y divide-slate-800 overflow-hidden rounded-xl bg-slate-900">
+        {ITEMS.map((item) => (
+          <li key={item.to}>
+            <Link to={item.to} className="flex items-center gap-3 px-3 py-4 active:bg-slate-800">
+              <span aria-hidden className="text-xl">{item.icon}</span>
+              <span className="flex-1">
+                <span className="block font-medium">{item.label}</span>
+                <span className="block text-xs text-slate-500">{item.detail}</span>
+              </span>
+              <span className="text-slate-500">›</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-4 text-xs text-slate-500">Próximamente: {UPCOMING.join(', ')}.</p>
     </>
   );
 }

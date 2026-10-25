@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { convert, formatMoney, formatMoneyShort, parseMoney, splitEvenly, sumCents } from './money';
+import { convert, formatCompact, formatMoney, formatMoneyShort, parseMoney, splitEvenly, sumCents } from './money';
 
 describe('formatMoney', () => {
   it('formatea en es-AR con miles y decimales', () => {
@@ -83,5 +83,20 @@ describe('convert', () => {
 
   it('cotización inválida', () => {
     expect(() => convert(100, 0)).toThrow();
+  });
+});
+
+describe('formatCompact', () => {
+  it.each([
+    [0, '0'],
+    [95_000, '950'],
+    [150_000, '1,5 mil'],
+    [100_000, '1 mil'],
+    [35_000_000, '350 mil'],
+    [120_000_000, '1,2 M'],
+    [100_000_000, '1 M'],
+    [-35_000_000, '-350 mil'],
+  ])('%i → %s', (cents, expected) => {
+    expect(formatCompact(cents)).toBe(expected);
   });
 });

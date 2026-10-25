@@ -3,9 +3,12 @@ import PageHeader from '../components/PageHeader';
 
 const ITEMS = [
   { to: '/mas/cuentas', label: 'Cuentas', detail: 'Bancos, efectivo y billeteras', icon: '🏦' },
+  { to: '/mas/categorias', label: 'Categorías', detail: 'Con subcategorías', icon: '🏷️' },
+  { to: '/mas/presupuestos', label: 'Presupuestos', detail: 'Límite mensual por categoría', icon: '🎯' },
+  { to: '/mas/cotizacion', label: 'Cotización del dólar', detail: 'Para los totales en pesos', icon: '💵' },
 ];
 
-const UPCOMING = ['Categorías', 'Presupuestos', 'Recurrentes', 'Cotización USD', 'Backup'];
+const UPCOMING = ['Recurrentes', 'Backup'];
 
 export default function Mas() {
   return (

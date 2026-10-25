@@ -62,6 +62,20 @@ export function parseMoney(input: string): number | null {
   return negative ? -cents : cents;
 }
 
+/**
+ * Monto abreviado para ejes y etiquetas chicas, sin símbolo: 950 → "950", 1.500 → "1,5 mil",
+ * 350.000 → "350 mil", 1.200.000 → "1,2 M". Recibe centavos.
+ */
+export function formatCompact(cents: number): string {
+  assertCents(cents);
+  const units = Math.abs(cents) / 100;
+  const sign = cents < 0 ? '-' : '';
+  const trim = (n: number) => n.toFixed(1).replace('.', ',').replace(/,0$/, '');
+  if (units >= 1_000_000) return `${sign}${trim(units / 1_000_000)} M`;
+  if (units >= 1_000) return `${sign}${trim(units / 1_000)} mil`;
+  return `${sign}${Math.round(units)}`;
+}
+
 /** Reparte un total en n partes enteras; el resto por redondeo va a la primera (SPEC §4.3). */
 export function splitEvenly(total: number, n: number): number[] {
   assertCents(total);

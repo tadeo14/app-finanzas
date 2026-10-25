@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import CardForm from '../components/CardForm';
+import CommitmentBars from '../components/CommitmentBars';
 import PayStatement from '../components/PayStatement';
 import EmptyState from '../components/EmptyState';
 import StatusBadge from '../components/StatusBadge';
@@ -354,29 +355,13 @@ function AdvanceForm({ purchaseId, currency, installments, currentPeriod, lastPe
 
 function FutureCommitments({ currentPeriod, installments }: { currentPeriod: string; installments: Installment[] }) {
   const months = futureCommitments(installments, currentPeriod, 12);
-  const max = Math.max(1, ...months.map((m) => Math.abs(m.totalARS)));
   const hasAny = months.some((m) => m.totalARS !== 0 || m.totalUSD !== 0);
 
   if (!hasAny) return <EmptyState>No tenés cuotas programadas en los próximos 12 meses.</EmptyState>;
   return (
     <section className="rounded-xl bg-slate-900 p-4">
       <h2 className="mb-3 text-sm font-medium text-slate-300">Cuotas de los próximos 12 meses</h2>
-      <ul className="space-y-2">
-        {months.map((m) => (
-          <li key={m.period} className="text-sm">
-            <div className="flex justify-between">
-              <span className="text-slate-400">{formatPeriod(m.period)}</span>
-              <span className="tabular-nums">
-                {formatMoney(m.totalARS)}
-                {m.totalUSD !== 0 && <span className="ml-2 text-xs text-slate-400">{formatMoney(m.totalUSD, 'USD')}</span>}
-              </span>
-            </div>
-            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-800">
-              <div className="h-full rounded-full bg-emerald-500" style={{ width: `${(Math.abs(m.totalARS) / max) * 100}%` }} />
-            </div>
-          </li>
-        ))}
-      </ul>
+      <CommitmentBars months={months} />
     </section>
   );
 }

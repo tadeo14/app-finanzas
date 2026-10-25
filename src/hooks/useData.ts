@@ -69,3 +69,7 @@ export function useSettings() {
 function sortByName<T extends { name: string }>(items: T[]): T[] {
   return items.sort((a, b) => a.name.localeCompare(b.name, 'es'));
 }
+
+export function useBudgets() {
+  return useLiveQuery(() => db.budgets.toArray(), []);
+}

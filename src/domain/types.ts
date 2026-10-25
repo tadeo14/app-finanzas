@@ -92,6 +92,8 @@ export interface StatementPayment {
   amountARS: number;
   amountUSD: number;
   exchangeRate?: number;
+  /** Un pago que cubre varios resúmenes (el vencido y el actual) se guarda en una fila por resumen, con el mismo groupId y un único movimiento de cuenta. */
+  groupId?: string;
 }
 
 export interface Budget {

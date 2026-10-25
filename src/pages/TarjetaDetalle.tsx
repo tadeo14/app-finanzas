@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import CardForm from '../components/CardForm';
+import PayStatement from '../components/PayStatement';
 import EmptyState from '../components/EmptyState';
 import StatusBadge from '../components/StatusBadge';
 import { ErrorList, Field, inputClass, PrimaryButton, SecondaryButton, Segmented } from '../components/ui';
@@ -15,11 +16,12 @@ import {
 } from '../domain/cards';
 import { addMonths, formatDate, formatPeriod, today } from '../domain/dates';
 import { formatMoney } from '../domain/money';
-import type { Card, CardPurchase, Category, Installment } from '../domain/types';
+import type { Account, Card, CardPurchase, Category, Installment, Statement, StatementPayment } from '../domain/types';
 import { advancePurchase, saveStatementDates } from '../db/cardsRepo';
+import { deleteStatementPayment } from '../db/paymentsRepo';
 import { ValidationError } from '../db/repo';
 import { db } from '../db/schema';
-import { useCard, useCategories, useInstallments, usePayments, usePurchases, useStatements } from '../hooks/useData';
+import { useAccounts, useCard, useCategories, useInstallments, usePayments, usePurchases, useStatements } from '../hooks/useData';
 
 type Tab = 'resumen' | 'cuotas' | 'futuro';
 
@@ -32,6 +34,7 @@ export default function TarjetaDetalle() {
   const purchases = usePurchases(cardId) ?? [];
   const payments = usePayments() ?? [];
   const categories = useCategories();
+  const accounts = useAccounts() ?? [];
   const [tab, setTab] = useState<Tab>('resumen');
   const [period, setPeriod] = useState<string>();
   const [editingCard, setEditingCard] = useState(false);
@@ -75,7 +78,7 @@ export default function TarjetaDetalle() {
 
       <div className="mt-4">
         {tab === 'resumen' && (
-          <StatementView card={card} period={shown} onPeriod={setPeriod} statements={statements} installments={installments} purchases={purchases} payments={payments} categories={categories} />
+          <StatementView card={card} period={shown} onPeriod={setPeriod} statements={statements} installments={installments} purchases={purchases} payments={payments} categories={categories} accounts={accounts} />
         )}
         {tab === 'cuotas' && <PendingPurchases currentPeriod={currentPeriod} purchases={purchases} installments={installments} />}
         {tab === 'futuro' && <FutureCommitments currentPeriod={currentPeriod} installments={installments} />}
@@ -85,7 +88,7 @@ export default function TarjetaDetalle() {
 }
 
 function StatementView({
-  card, period, onPeriod, statements, installments, purchases, payments, categories,
+  card, period, onPeriod, statements, installments, purchases, payments, categories, accounts,
 }: {
   card: Card;
   period: string;
@@ -95,8 +98,11 @@ function StatementView({
   purchases: CardPurchase[];
   payments: NonNullable<ReturnType<typeof usePayments>>;
   categories: Category[];
+  accounts: Account[];
 }) {
   const [editingDates, setEditingDates] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [notice, setNotice] = useState<string>();
   const summary = statementSummary(card, statements, installments, payments, period, today());
   const purchaseById = new Map(purchases.map((p) => [p.id, p]));
   const categoryById = new Map(categories.map((c) => [c.id, c]));
@@ -108,9 +114,9 @@ function StatementView({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between rounded-xl bg-slate-900 px-2 py-1">
-        <button type="button" aria-label="Resumen anterior" onClick={() => onPeriod(addMonths(period, -1))} className="px-3 py-2 text-xl text-slate-300">←</button>
+        <button type="button" aria-label="Resumen anterior" onClick={() => { setNotice(undefined); onPeriod(addMonths(period, -1)); }} className="px-3 py-2 text-xl text-slate-300">←</button>
         <span className="font-medium">{formatPeriod(period)}</span>
-        <button type="button" aria-label="Resumen siguiente" onClick={() => onPeriod(addMonths(period, 1))} className="px-3 py-2 text-xl text-slate-300">→</button>
+        <button type="button" aria-label="Resumen siguiente" onClick={() => { setNotice(undefined); onPeriod(addMonths(period, 1)); }} className="px-3 py-2 text-xl text-slate-300">→</button>
       </div>
 
       <section className="rounded-xl bg-slate-900 p-4">
@@ -140,6 +146,24 @@ function StatementView({
         </div>
       </section>
 
+      {notice && (
+        <p role="status" className="flex items-start justify-between gap-3 rounded-xl bg-emerald-950/60 p-3 text-sm text-emerald-200">
+          <span>{notice}</span>
+          <button type="button" onClick={() => setNotice(undefined)} aria-label="Cerrar aviso" className="text-emerald-400">✕</button>
+        </p>
+      )}
+
+      {paying ? (
+        <PayStatement card={card} period={period} summary={summary} accounts={accounts} statements={statements} installments={installments} payments={payments} onDone={(message) => { setPaying(false); setNotice(message); }} />
+      ) : (
+        (summary.remainingARS > 0 || summary.remainingUSD > 0) && (
+          <PrimaryButton type="button" onClick={() => setPaying(true)}>Pagar resumen</PrimaryButton>
+        )
+      )}
+      {paying && <SecondaryButton type="button" onClick={() => setPaying(false)}>Cancelar pago</SecondaryButton>}
+
+      <PaymentsList period={period} card={card} statements={statements} payments={payments} accounts={accounts} />
+
       {rows.length === 0 ? (
         <EmptyState>No hay compras en este resumen. Cargalas con el botón +, eligiendo "Tarjeta".</EmptyState>
       ) : (
@@ -167,6 +191,40 @@ function StatementView({
         </ul>
       )}
     </div>
+  );
+}
+
+function PaymentsList({ period, card, statements, payments, accounts }: {
+  period: string; card: Card; statements: Statement[]; payments: StatementPayment[]; accounts: Account[];
+}) {
+  const statementIds = new Set(statements.filter((s) => s.cardId === card.id && s.period === period).map((s) => s.id));
+  const own = payments.filter((p) => statementIds.has(p.statementId)).sort((a, b) => a.date.localeCompare(b.date));
+  if (own.length === 0) return null;
+  const accountName = (id: string) => accounts.find((a) => a.id === id)?.name ?? 'Cuenta borrada';
+
+  async function handleDelete(payment: StatementPayment) {
+    if (window.confirm('¿Deshacer este pago? También se borra el movimiento de la cuenta.')) await deleteStatementPayment(db, payment.id);
+  }
+
+  return (
+    <section>
+      <h2 className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">Pagos</h2>
+      <ul className="divide-y divide-slate-800 overflow-hidden rounded-xl bg-slate-900">
+        {own.map((p) => (
+          <li key={p.id} className="flex items-center gap-3 px-3 py-3 text-sm">
+            <span className="min-w-0 flex-1">
+              <span className="block">{formatDate(p.date)}</span>
+              <span className="block truncate text-xs text-slate-500">desde {accountName(p.accountId)}</span>
+            </span>
+            <span className="text-right tabular-nums text-emerald-400">
+              {p.amountARS > 0 && <span className="block">{formatMoney(p.amountARS)}</span>}
+              {p.amountUSD > 0 && <span className="block">{formatMoney(p.amountUSD, 'USD')}</span>}
+            </span>
+            <button type="button" onClick={() => handleDelete(p)} aria-label={`Deshacer pago del ${formatDate(p.date)}`} className="px-2 text-slate-600 active:text-red-400">🗑</button>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

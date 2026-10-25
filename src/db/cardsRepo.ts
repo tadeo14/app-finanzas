@@ -10,7 +10,7 @@ import {
 } from '../domain/cards';
 import { isValidDate } from '../domain/dates';
 import type { Card, CardPurchase, Statement } from '../domain/types';
-import { ValidationError } from './repo';
+import { ValidationError } from './errors';
 import type { FinanzasDB } from './schema';
 
 export type CardDraft = Omit<Card, 'id'> & { id?: string };

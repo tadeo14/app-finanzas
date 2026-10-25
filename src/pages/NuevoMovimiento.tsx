@@ -4,7 +4,8 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import CategoryGrid from '../components/CategoryGrid';
 import MoneyInput from '../components/MoneyInput';
 import { ErrorList, Field, inputClass, PrimaryButton, Segmented, SecondaryButton } from '../components/ui';
-import { today } from '../domain/dates';
+import { formatDate, today } from '../domain/dates';
+import { formatMoney } from '../domain/money';
 import type { Transaction } from '../domain/types';
 import { deleteTransaction, saveTransaction, ValidationError } from '../db/repo';
 import { db } from '../db/schema';
@@ -77,6 +78,29 @@ export default function NuevoMovimiento() {
   const visibleCategories = categories.filter(
     (c) => c.kind === (type === 'income' ? 'income' : 'expense') && c.id !== CARD_PAYMENT_CATEGORY_ID,
   );
+
+  // El movimiento de un pago de tarjeta es de solo lectura: se deshace desde acá o desde el resumen.
+  if (existing?.statementPaymentId) {
+    const paidFrom = (allAccounts ?? []).find((a) => a.id === existing.accountId);
+    return (
+      <div className="space-y-5">
+        <div className="flex items-center justify-between">
+          <button type="button" onClick={() => navigate(-1)} className="py-2 text-slate-400">Volver</button>
+          <h1 className="text-lg font-semibold">Pago de tarjeta</h1>
+          <span className="w-16" />
+        </div>
+        <section className="rounded-xl bg-slate-900 p-4">
+          <p className="text-3xl font-semibold tabular-nums">{formatMoney(existing.amount, paidFrom?.currency ?? 'ARS')}</p>
+          <p className="mt-2 text-sm text-slate-300">{existing.description}</p>
+          <p className="text-xs text-slate-500">{formatDate(existing.date)} · {paidFrom?.name ?? 'Cuenta borrada'}</p>
+        </section>
+        <p className="text-sm text-slate-400">
+          Este movimiento registra el pago de un resumen y no se edita. Si hay un error, deshacelo y registralo de nuevo desde el resumen de la tarjeta.
+        </p>
+        <SecondaryButton type="button" onClick={handleDelete} className="border-red-900 text-red-300">Deshacer pago</SecondaryButton>
+      </div>
+    );
+  }
 
   if (id && existing === null) {
     return (

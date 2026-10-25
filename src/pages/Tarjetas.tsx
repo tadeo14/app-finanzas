@@ -12,18 +12,20 @@ import { useCards, useInstallments, usePayments, useStatements } from '../hooks/
 
 export default function Tarjetas() {
   const cards = useCards();
-  const statements = useStatements() ?? [];
-  const installments = useInstallments() ?? [];
-  const payments = usePayments() ?? [];
+  const statements = useStatements();
+  const installments = useInstallments();
+  const payments = usePayments();
   const [creating, setCreating] = useState(false);
 
   if (creating) return <CardForm draft={EMPTY_CARD} onDone={() => setCreating(false)} />;
+  // Sin todos los datos los totales saldrían en cero por un instante.
+  if (!cards || !statements || !installments || !payments) return null;
 
-  const active = (cards ?? []).filter((c) => !c.archived);
-  const archived = (cards ?? []).filter((c) => c.archived);
+  const active = cards.filter((c) => !c.archived);
+  const archived = cards.filter((c) => c.archived);
   const now = today();
 
-  const renderCard = (card: NonNullable<typeof cards>[number]) => {
+  const renderCard = (card: (typeof cards)[number]) => {
     const own = statements.filter((s) => s.cardId === card.id);
     const period = periodForPurchase(card, own, now);
     const summary = statementSummary(card, own, installments, payments, period, now);
@@ -57,7 +59,7 @@ export default function Tarjetas() {
   return (
     <>
       <PageHeader title="Tarjetas" />
-      {cards && cards.length === 0 ? (
+      {cards.length === 0 ? (
         <EmptyState>Agregá tus tarjetas de crédito con sus días de cierre y vencimiento. Después cargá las compras y las cuotas se reparten solas en los resúmenes.</EmptyState>
       ) : (
         <>

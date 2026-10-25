@@ -254,7 +254,7 @@ interface Totals {
   USD: number;
 }
 
-function totalsFor(items: readonly Installment[], cardId: string, period: string): Totals {
+export function totalsFor(items: readonly Installment[], cardId: string, period: string): Totals {
   const totals: Totals = { ARS: 0, USD: 0 };
   for (const i of items) {
     if (i.cardId === cardId && i.period === period && i.status === 'scheduled') totals[i.currency] += i.amount;
@@ -262,7 +262,7 @@ function totalsFor(items: readonly Installment[], cardId: string, period: string
   return totals;
 }
 
-function paymentsFor(
+export function paymentsFor(
   statements: readonly Statement[],
   payments: readonly StatementPayment[],
   cardId: string,

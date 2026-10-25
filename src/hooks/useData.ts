@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useMemo } from 'react';
 import { balancesById } from '../domain/accounts';
 import type { Account, Card, CardPurchase, Category, Installment, Statement, StatementPayment, Transaction } from '../domain/types';
-import { db } from '../db/schema';
+import { db, SETTINGS_ID } from '../db/schema';
 
 const NONE: never[] = [];
 
@@ -60,6 +60,10 @@ export function usePayments(): StatementPayment[] | undefined {
 
 export function usePurchase(id: string | undefined): CardPurchase | undefined | null {
   return useLiveQuery(async () => (id ? (await db.cardPurchases.get(id)) ?? null : null), [id]);
+}
+
+export function useSettings() {
+  return useLiveQuery(() => db.settings.get(SETTINGS_ID), []);
 }
 
 function sortByName<T extends { name: string }>(items: T[]): T[] {

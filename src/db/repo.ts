@@ -1,14 +1,11 @@
 // Escrituras sobre la base. Validan con las funciones de dominio antes de guardar.
 import { validateTransaction } from '../domain/accounts';
 import type { Account, Transaction } from '../domain/types';
+import { ValidationError } from './errors';
+import { deleteStatementPayment } from './paymentsRepo';
 import type { FinanzasDB } from './schema';
 
-export class ValidationError extends Error {
-  constructor(public readonly errors: string[]) {
-    super(errors.join(' '));
-    this.name = 'ValidationError';
-  }
-}
+export { ValidationError };
 
 export type AccountDraft = Omit<Account, 'id'> & { id?: string };
 export type TransactionDraft = Omit<Transaction, 'id'> & { id?: string };
@@ -51,6 +48,9 @@ export async function deleteAccount(database: FinanzasDB, accountId: string): Pr
 }
 
 export async function saveTransaction(database: FinanzasDB, draft: TransactionDraft): Promise<string> {
+  if (draft.statementPaymentId) {
+    throw new ValidationError(['Los pagos de tarjeta no se editan: borralo y registralo de nuevo desde el resumen.']);
+  }
   const clean: TransactionDraft = { ...draft, description: draft.description.trim() };
   if (clean.type !== 'transfer') {
     delete clean.toAccountId;
@@ -75,6 +75,12 @@ export async function saveTransaction(database: FinanzasDB, draft: TransactionDr
   return transaction.id;
 }
 
+/** Si el movimiento es el pago de un resumen, deshace también el pago (para no dejar el resumen como pagado). */
 export async function deleteTransaction(database: FinanzasDB, transactionId: string): Promise<void> {
+  const tx = await database.transactions.get(transactionId);
+  if (tx?.statementPaymentId) {
+    await deleteStatementPayment(database, tx.statementPaymentId);
+    return;
+  }
   await database.transactions.delete(transactionId);
 }

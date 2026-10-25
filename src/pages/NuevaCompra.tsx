@@ -4,13 +4,14 @@ import CategoryGrid from '../components/CategoryGrid';
 import MoneyInput from '../components/MoneyInput';
 import { ErrorList, Field, inputClass, PrimaryButton, SecondaryButton, Segmented } from '../components/ui';
 import { previewPurchase, validatePurchase } from '../domain/cards';
-import { today } from '../domain/dates';
+import { periodsWithPayments } from '../domain/payments';
+import { formatPeriod, today } from '../domain/dates';
 import type { CardPurchase, Currency } from '../domain/types';
 import { deletePurchase, savePurchase } from '../db/cardsRepo';
 import { ValidationError } from '../db/repo';
 import { db } from '../db/schema';
 import { CARD_PAYMENT_CATEGORY_ID } from '../db/seed';
-import { useCards, useCategories, useInstallments, usePurchase, useStatements } from '../hooks/useData';
+import { useCards, useCategories, useInstallments, usePayments, usePurchase, useStatements } from '../hooks/useData';
 
 const PRESETS = [1, 3, 6, 9, 12, 18, 24];
 type Mode = 'expense' | 'income' | 'transfer' | 'card';
@@ -77,7 +78,13 @@ export default function NuevaCompra() {
   const card = usableCards.find((c) => c.id === cardId);
   const statements = useStatements(cardId) ?? [];
   const ownInstallments = useInstallments(cardId) ?? [];
+  const payments = usePayments() ?? [];
   const hadAdvance = ownInstallments.some((i) => i.purchaseId === id && i.status === 'cancelled');
+  // Aviso (SPEC §4.4): editar regenera las cuotas, y alguna puede caer en un resumen que ya tiene pagos.
+  const paidPeriods = card ? periodsWithPayments(card, statements, payments) : new Set<string>();
+  const paidAffected = id
+    ? [...new Set(ownInstallments.filter((i) => i.purchaseId === id && i.status === 'scheduled' && paidPeriods.has(i.period)).map((i) => i.period))].sort()
+    : [];
   const expenseCategories = categories.filter((c) => c.kind === 'expense' && c.id !== CARD_PAYMENT_CATEGORY_ID);
 
   const draft: Omit<CardPurchase, 'id'> | null =
@@ -237,6 +244,12 @@ export default function NuevaCompra() {
           </label>
         </div>
       </details>
+
+      {paidAffected.length > 0 && (
+        <p className="rounded-xl bg-amber-950/50 p-3 text-xs text-amber-200">
+          Alguna cuota de esta compra cae en un resumen que ya tiene pagos ({paidAffected.map(formatPeriod).join(', ')}). Si cambiás montos, fechas o cuotas, los pagos registrados no se modifican: revisalos después.
+        </p>
+      )}
 
       {hadAdvance && (
         <p className="rounded-xl bg-amber-950/50 p-3 text-xs text-amber-200">

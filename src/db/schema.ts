@@ -46,6 +46,8 @@ export class FinanzasDB extends Dexie {
       recurrings: 'id',
       settings: 'id',
     });
+    // v2: un pago que cubre varios resúmenes se agrupa por groupId (campo opcional, sin migrar datos).
+    this.version(2).stores({ statementPayments: 'id, statementId, groupId' });
   }
 }
 

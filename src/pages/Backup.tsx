@@ -106,9 +106,14 @@ export default function Backup() {
         </p>
       </div>
 
-      <h2 className="mb-2 mt-8 text-xs font-medium uppercase tracking-wide text-slate-500">Importar</h2>
+      <h2 className="mb-2 mt-8 text-xs font-medium uppercase tracking-wide text-slate-500">Importar un backup (reemplaza todo)</h2>
       <input ref={fileInput} type="file" accept="application/json,.json" aria-label="Elegir archivo de backup" onChange={(e) => void handleFile(e.target.files?.[0])}
         className="block w-full text-sm text-slate-300 file:mr-3 file:rounded-xl file:border-0 file:bg-slate-800 file:px-4 file:py-3 file:text-sm file:font-medium file:text-slate-100" />
+
+      <p className="mt-3 text-xs text-slate-500">
+        ¿Querés <strong>sumar</strong> una lista de gastos e ingresos desde una planilla o el extracto del banco, sin borrar nada?{' '}
+        <Link to="/mas/importar" className="text-emerald-400 underline">Importar movimientos</Link>.
+      </p>
 
       {pending && counts && (
         <section className="mt-4 space-y-3 rounded-xl border border-red-900/60 bg-slate-900 p-4">

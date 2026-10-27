@@ -10,6 +10,7 @@ import Backup from './pages/Backup';
 import Categorias from './pages/Categorias';
 import Cotizacion from './pages/Cotizacion';
 import Cuentas from './pages/Cuentas';
+import Importar from './pages/Importar';
 import Inicio from './pages/Inicio';
 import Mas from './pages/Mas';
 import Movimientos from './pages/Movimientos';
@@ -88,6 +89,7 @@ export default function App() {
             <Route path="/mas/cotizacion" element={<Cotizacion />} />
             <Route path="/mas/recurrentes" element={<Recurrentes />} />
             <Route path="/mas/backup" element={<Backup />} />
+            <Route path="/mas/importar" element={<Importar />} />
             <Route path="/mas/apariencia" element={<Apariencia />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

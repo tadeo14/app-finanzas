@@ -6,6 +6,7 @@ const ITEMS = [
   { to: '/mas/cuentas', label: 'Cuentas', detail: 'Bancos, efectivo y billeteras', icon: '🏦' },
   { to: '/mas/categorias', label: 'Categorías', detail: 'Con subcategorías', icon: '🏷️' },
   { to: '/mas/presupuestos', label: 'Presupuestos', detail: 'Límite mensual por categoría', icon: '🎯' },
+  { to: '/mas/importar', label: 'Importar movimientos', detail: 'Desde un CSV o una planilla', icon: '📥' },
   { to: '/mas/recurrentes', label: 'Recurrentes', detail: 'Gastos fijos y suscripciones', icon: '🔁' },
   { to: '/mas/apariencia', label: 'Apariencia', detail: 'Claro, oscuro o automático', icon: '🌓' },
   { to: '/mas/cotizacion', label: 'Cotización del dólar', detail: 'Para los totales en pesos', icon: '💵' },

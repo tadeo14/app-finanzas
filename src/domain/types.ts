@@ -33,6 +33,8 @@ export interface Transaction {
   description: string;
   statementPaymentId?: string;
   recurringId?: string;
+  /** Lote de importación desde un CSV: permite deshacer toda la importación junta. */
+  importId?: string;
 }
 
 export interface Card {

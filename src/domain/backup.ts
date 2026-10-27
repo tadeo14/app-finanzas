@@ -51,6 +51,7 @@ const RULES: Record<BackupTable, Record<string, Check>> = {
   transactions: {
     type: oneOf('expense', 'income', 'transfer'), accountId: isStr, amount: int(1), date: isDate,
     toAccountId: optional(isStr), toAmount: optional(int(1)), categoryId: optional(isStr), statementPaymentId: optional(isStr),
+    importId: optional(isStr),
   },
   cards: { name: isStr, defaultClosingDay: int(1, 31), defaultDueDay: int(1, 31), archived: isBool, limit: optional(int(1)) },
   statements: { cardId: isStr, period: isPeriod, closingDate: isDate, dueDate: isDate },

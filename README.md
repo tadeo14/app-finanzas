@@ -13,8 +13,21 @@ Corre 100 % en el navegador: no hay servidor, ni cuenta, ni costos. Los datos vi
 - **Presupuestos** por categoría (para todos los meses o para uno puntual) con alerta al 80 % y al 100 %.
 - **Reportes**: gastos por categoría con detalle de subcategorías y evolución mensual de ingresos contra gastos.
 - **Recurrentes**: gastos fijos, ingresos y suscripciones (incluso con tarjeta) que se cargan solos al abrir la app.
+- **Importar movimientos** desde un CSV (una planilla o el extracto de tu banco): detecta las columnas, muestra una vista previa con los errores y los que ya existen, y se puede deshacer.
 - **Backup**: exportar todo a JSON, importar (con validación completa antes de reemplazar), exportar movimientos a CSV y recordatorio si pasaron más de 15 días.
 - **Modo claro y oscuro** (automático según el dispositivo, o a elección) e **instalable** como app, también sin conexión.
+
+## Importar una lista de movimientos
+
+*Más → Importar movimientos* carga de una vez una lista de gastos e ingresos desde un archivo **CSV** (si tenés un Excel, guardalo como CSV). Suma movimientos: no borra ni cambia los que ya tenés.
+
+- **Columnas**: se reconocen por el encabezado (Fecha, Descripción, Monto, Categoría, Cuenta, Tipo, Moneda…) y, si no hay encabezado, por el contenido. Se pueden corregir a mano. Sirven tanto una columna de monto (negativo = gasto) como columnas separadas de Débito y Crédito, o una columna de Tipo.
+- **Formatos**: separador `;`, `,`, tabulación o `|`; fechas `15/10/2026`, `2026-10-15` o `10/15/2026`; montos `1.234,56`, `1,234.56`, `$ 1.000`, `(500)`, `500-`.
+- **Vista previa** antes de guardar: cuántos entran, cuáles tienen error (con el número de línea y el motivo) y cuáles ya existen.
+- **Sin duplicados**: un movimiento igual a uno que ya está (misma cuenta, tipo, día, monto y descripción) se saltea, así que reimportar el mismo archivo no agrega nada.
+- **Categorías**: se asocian por nombre (también `Comida > Supermercado`); las que no existen se pueden crear.
+- **Deshacer**: al terminar se puede deshacer toda la importación.
+- No se importan las transferencias ni las cuotas de tarjeta (se cargan desde el botón +). El CSV que exporta la propia app se puede volver a importar.
 
 ## Tus datos
 
